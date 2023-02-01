@@ -1,5 +1,7 @@
+#pip3 install fpdf
+#pip3 install imagesize
 '''
-    convert bitwarden export to html
+    convert bitwarden export to pdf
 '''
 
 from glob import glob
@@ -7,84 +9,73 @@ from os.path import exists, join
 import json
 from jinja2 import Environment
 
+#for the pdf creation
+from fpdf import FPDF
 
-TEMPLATE = '''<!DOCTYPE html>
-<html lang="en" class="extdovdh idc0_341">
-  <head>
-    <title>My Vault</title>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <!-- Latest compiled and minified CSS -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
-      integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu"
-      crossorigin="anonymous"
-    />
+#for the creation-date
+import datetime
+x = datetime.datetime.now()
+date = x.strftime("%Y") + '-' + x.strftime("%m") + '-' + x.strftime("%d")
 
-    <!-- Optional theme -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap-theme.min.css"
-      integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ"
-      crossorigin="anonymous"
-    />
+#for the image
+import imagesize
 
-    <!-- Latest compiled and minified JavaScript -->
-    <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"
-      integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
-      crossorigin="anonymous"
-    ></script>
-  </head>
-  <body>
-    <h1>My Vault</h1>
-    <section class="ftco-section">
-      <div class="container">
-        {% for category in categories %}
-        <div class="row justify-content-center">
-          <div class="col-md-6 text-center mb-5">
-            <h2 class="heading-section">{{ category.name }}</h2>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-12">
-            <div class="table-wrap">
-              <table class="table table-bordered table-dark table-hover">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Note</th>
-                    <th>Username</th>
-                    <th>Password</th>
-                    <th>URL</th>
-                  </tr>
-                </thead>
 
-                <tbody>
-                  {% for item in category["items"] %}
-                  <tr>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.notes }}</td>
-                    <td>{{ item.username }}</td>
-                    <td>{{ item.password }}</td>
-                    <td>{{ item.url }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </section>
-  </body>
-</html>
-'''
+
+
+# initializing variables with values
+fileName = 'Bitwarden - Passwortliste.pdf'
+documentTitle = 'Bitwarden - Passwortliste'
+title = 'Bitwarden - Passwortliste'
+subTitle = 'Streng geheim!'
+#image = 'MZ.png'
+image = 'eching_image.jpg'
+
+width, height = imagesize.get(image)
+
+
+class PDF(FPDF):
+    def header(self):
+      if self.page_no() == 1:
+        # Logo
+        #self.image(image, 100, 15, 20)#markus
+        self.image(image, 70, 15, 70)#eching
+
+        # Arial bold 15
+        self.set_font('Cardelina', '', 36)
+        # Move to the right
+        self.cell(80)
+        # Title
+        self.cell(30, 70, documentTitle, 0, 0, 'C')
+        # Line break
+        self.ln(50)
+
+    # Page footer
+    def footer(self):
+        # Position at 1.5 cm from bottom
+        self.set_y(-15)
+        # Arial italic 8
+        self.set_font('Cardelina', '', 8)
+        # Page number
+        self.cell(0, 10, date + ' || ' 'Seite ' + str(self.page_no()) + '/{nb}', 0, 0, 'C')
+
+
+pdf = PDF(orientation='P', unit='mm', format='A4')
+
+pdf.add_font('Cardelina','','Cardelina.ttf', uni=True)
+
+#pdf_w=210
+#pdf_h=297
+pdf.set_font('Cardelina', '', 16)
+pdf.alias_nb_pages()
+pdf.add_page()
+#pdf.ln(30)
+
+
+
+
+
+
 
 
 def get_password_file_name():
@@ -126,6 +117,7 @@ def parse_item(bitwarden_item):
     i_item = {}
     i_item["name"] = check_field(bitwarden_item, "name")
     i_item["notes"] = check_field(bitwarden_item, "notes")
+    i_item["type"] = check_field(bitwarden_item, "type")
     login = check_field(bitwarden_item, "login")
     if login:
         i_item["username"] = check_field(login, "username")
@@ -137,22 +129,24 @@ def parse_item(bitwarden_item):
     return i_item
 
 
-def parse_to_html():
-    '''
-    Converts bitwarden export to html
-    '''
-    env = Environment()
 
-    loaded_template = env.from_string(TEMPLATE)
-    categories = []
-    unrelated_category = {'name': 'Uncategorized', 'items': []}
-    categories.append(unrelated_category)
+print("Passwortliste: " + get_password_file_name())
 
-    with open(get_password_file_name(), 'r', encoding="utf-8") as bitwarden_file:
+#with open('./output.html', 'w', encoding="utf-8") as input_file:
+    #html_file.write(parse_to_html())
+    
+categories = []
+unrelated_category = {'name': 'Uncategorized', 'items': []}
+categories.append(unrelated_category)
+
+with open(get_password_file_name(), 'r', encoding="utf-8") as bitwarden_file:
         data = json.load(bitwarden_file)
+        #print(data)
         for folder in data["folders"]:
             folder_id = folder["id"]
             folder_name = folder["name"]
+            #pdf.drawText(folder["name"])
+            #print(folder_name)
             category = {}
             category["items"] = []
             category["name"] = folder_name
@@ -164,8 +158,37 @@ def parse_to_html():
             if item["folderId"] is None:
                 unrelated_category["items"].append(parse_item(item))
 
-    return loaded_template.render(categories=categories)
 
+for category in categories:
+   for item in category["items"]:
+      pdf.set_text_color(0)
+      pdf.set_font_size(16)
+      pdf.cell(0, 5, item["name"], 0, 1)
+      pdf.set_text_color(155)
+      pdf.set_font_size(12)
+      if item["type"] == 1:
+        pdf.cell(0, 5, "Username: " + item["username"], 0, 1)
+        pdf.cell(0, 5, "Password: " + item["password"], 0, 1)
+      if item["url"]:
+        pdf.multi_cell(0, 5, "URL: " + item["url"], 0, 1)
+      if item["notes"]:
+        pdf.multi_cell(0, 5, "Notes: " + item["notes"], 0, 1)
+      pdf.ln(8)
+      
+#     text.setFillColor(colors.black)
+#     text.setFont('abc', 16)
+#     text.textLine(text=item["name"])
+#     text.setFont('abc', 12)
+#     text.setFillColor(colors.gray)
+#     text.textLine(text="Username: " + item["username"])
+#     text.textLine(text="Password: " + item["password"])
+#     text.textLine(text="URL: " + item["url"])
+#     if item["notes"]:
+#       text.textLine(text="Notes: " + item["notes"])
+#     text.textLine(text="")
+    
+    
 
-with open('./output.html', 'w', encoding="utf-8") as html_file:
-    html_file.write(parse_to_html())
+pdf.output(fileName,'F')
+    
+    
