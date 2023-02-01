@@ -16,7 +16,6 @@ Then run `bitwarden_json2pdf.py` in the terminal.
 Run the following commands in your terminal
 
 ```bash
-pip3 install jinja2
 pip3 install json
 pip3 install fpdf
 

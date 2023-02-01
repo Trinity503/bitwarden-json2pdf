@@ -6,7 +6,6 @@
 from glob import glob
 from os.path import exists, join
 import json
-from jinja2 import Environment
 
 #for the pdf creation
 from fpdf import FPDF
