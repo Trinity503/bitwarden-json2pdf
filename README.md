@@ -1,16 +1,13 @@
-# bitwarden-pdf-converter
+# bitwarden-json2pdf
 
-Put your bitwarden export .json file in the resources directory and rename it to password.json.
+Converts your exported bitwarden-vault (json-file) to a pdf-file.
 
-Then run `bitwarden_pdf_converter.py` in the terminal.
 
 ## Usage
 
-Place your bitwarden-export .json file next to the bitwarden_pdf_converter.py file.
+Put your bitwarden_export.json file in the same directory as the script.
 
-Then run `python bitwarden_pdf_converter.py` in the terminal. (requires thrid-party software, see [installation](#installation))
-
-Or run `python bitwarden_html_converter.py` in the terminal and print the file manually.
+Then run `bitwarden_json2pdf.py` in the terminal.
 
 ## Installation
 
@@ -29,9 +26,10 @@ python bitwarden_html_converter.py
 Run the following commands in your terminal
 
 ```bash
-pip install pdfkit
-pip install jinja2
-pip install json
+pip3 install jinja2
+pip3 install json
+pip3 install fpdf
+
 ```
 
 For windows install [wkhtmltopdf](https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_msvc2015-win64.exe)

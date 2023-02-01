@@ -1,5 +1,4 @@
 #pip3 install fpdf
-#pip3 install imagesize
 '''
     convert bitwarden export to pdf
 '''
@@ -17,8 +16,6 @@ import datetime
 x = datetime.datetime.now()
 date = x.strftime("%Y") + '-' + x.strftime("%m") + '-' + x.strftime("%d")
 
-#for the image
-import imagesize
 
 
 
@@ -28,20 +25,15 @@ fileName = 'Bitwarden - Passwortliste.pdf'
 documentTitle = 'Bitwarden - Passwortliste'
 title = 'Bitwarden - Passwortliste'
 subTitle = 'Streng geheim!'
-#image = 'MZ.png'
-image = 'eching_image.jpg'
-
-width, height = imagesize.get(image)
+image = 'image.jpg'
 
 
 class PDF(FPDF):
     def header(self):
       if self.page_no() == 1:
         # Logo
-        #self.image(image, 100, 15, 20)#markus
-        self.image(image, 70, 15, 70)#eching
-
-        # Arial bold 15
+        self.image(image, 100, 15, 20)
+        # Cardelina bold 15
         self.set_font('Cardelina', '', 36)
         # Move to the right
         self.cell(80)
@@ -54,7 +46,7 @@ class PDF(FPDF):
     def footer(self):
         # Position at 1.5 cm from bottom
         self.set_y(-15)
-        # Arial italic 8
+        # Cardelina italic 8
         self.set_font('Cardelina', '', 8)
         # Page number
         self.cell(0, 10, date + ' || ' 'Seite ' + str(self.page_no()) + '/{nb}', 0, 0, 'C')
@@ -175,20 +167,7 @@ for category in categories:
         pdf.multi_cell(0, 5, "Notes: " + item["notes"], 0, 1)
       pdf.ln(8)
       
-#     text.setFillColor(colors.black)
-#     text.setFont('abc', 16)
-#     text.textLine(text=item["name"])
-#     text.setFont('abc', 12)
-#     text.setFillColor(colors.gray)
-#     text.textLine(text="Username: " + item["username"])
-#     text.textLine(text="Password: " + item["password"])
-#     text.textLine(text="URL: " + item["url"])
-#     if item["notes"]:
-#       text.textLine(text="Notes: " + item["notes"])
-#     text.textLine(text="")
     
-    
-
 pdf.output(fileName,'F')
     
     
