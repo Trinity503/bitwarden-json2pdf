@@ -9,14 +9,13 @@ This repository is based on the following repository: bitwarden-pdf-converter
 
 Put your bitwarden_export.json file in the same directory as the script.
 
-Then run `bitwarden_json2pdf.py` in the terminal.
+Then run `python3 bitwarden_json2pdf.py` in the terminal.
 
 ## Installation
 
 Run the following commands in your terminal
 
 ```bash
-pip3 install json
 pip3 install fpdf
 
 ```
