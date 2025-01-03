@@ -158,12 +158,12 @@ for category in categories:
       pdf.set_text_color(155)
       pdf.set_font_size(12)
       if item["type"] == 1:
-        pdf.cell(0, 5, "Username: " + item["username"], 0, 1)
-        pdf.cell(0, 5, "Password: " + item["password"], 0, 1)
+        pdf.cell(0, 5, "Username: " + str(item["username"]), 0, 1)
+        pdf.cell(0, 5, "Password: " + str(item["password"]), 0, 1)
       if item["url"]:
-        pdf.multi_cell(0, 5, "URL: " + item["url"], 0, 1)
+        pdf.multi_cell(0, 5, "URL: " + str(item["url"]), 0, 1)
       if item["notes"]:
-        pdf.multi_cell(0, 5, "Notes: " + item["notes"], 0, 1)
+        pdf.multi_cell(0, 5, "Notes: " + str(item["notes"]), 0, 1)
       pdf.ln(8)
       
     
